@@ -19,7 +19,7 @@ PACE lives in a `pace/` subdirectory at the root of your repository:
 
 ```bash
 # From your repo root
-git clone https://github.com/your-org/pace-framework-starter pace
+git clone https://github.com/pace-framework-org/pace-framework-starter pace
 ```
 
 Your directory structure will look like:

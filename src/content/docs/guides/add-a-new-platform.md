@@ -187,7 +187,7 @@ GATE uses `conclusion` to evaluate the CI criterion:
 
 ## Submitting your adapter
 
-If your adapter could benefit others, open a pull request against the [pace-framework-starter](https://github.com/your-org/pace-framework-starter) repository. Include:
+If your adapter could benefit others, open a pull request against the [pace-framework-starter](https://github.com/pace-framework-org/pace-framework-starter) repository. Include:
 - The adapter file in `pace/platforms/`
 - The factory registration in `pace/platforms/__init__.py`
 - Required environment variables documented in `README.md`
