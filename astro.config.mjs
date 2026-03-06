@@ -61,6 +61,5 @@ export default defineConfig({
       ],
     }),
   ],
-  site: 'https://pace-framework-org.github.io',
-  base: '/pace-docs',
+  site: 'https://pace-framework.org',
 });
