@@ -1,0 +1,64 @@
+---
+title: PACE Framework
+description: AI-driven sprint execution for software teams. Plan · Architect · Code · Evaluate.
+template: splash
+hero:
+  tagline: AI agents that plan, build, review, and ship your sprint — day by day.
+  image:
+    file: ../../assets/pace-logo.svg
+  actions:
+    - text: Quickstart
+      link: /tutorials/quickstart/
+      icon: right-arrow
+      variant: primary
+    - text: View on GitHub
+      link: https://github.com/your-org/pace-framework-starter
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+## What is PACE?
+
+**PACE** (Plan · Architect · Code · Evaluate) is an AI-driven sprint execution framework. Instead of one monolithic AI generating an entire feature, PACE runs a structured team of six specialised agents that mirror the roles of a real engineering squad:
+
+<CardGrid>
+  <Card title="PRIME — Planning" icon="pencil">
+    Reads your sprint plan and generates a daily Story Card with user stories, acceptance criteria, and scope boundaries.
+  </Card>
+  <Card title="FORGE — Implementation" icon="laptop">
+    Writes production code using a tool-calling loop. Follows TDD, respects source directory boundaries, and produces a Handoff Note.
+  </Card>
+  <Card title="GATE — Quality" icon="approve-check">
+    Runs your test suite, checks CI results, and evaluates every acceptance criterion. Issues SHIP, HOLD, or PARTIAL decisions.
+  </Card>
+  <Card title="SENTINEL — Security & SRE" icon="warning">
+    Scans for hardcoded secrets, input validation gaps, missing timeouts, and unhandled error paths.
+  </Card>
+  <Card title="CONDUIT — DevOps" icon="setting">
+    Reviews CI/CD workflows, Makefile targets, dependency lock files, and deployment configuration.
+  </Card>
+  <Card title="SCRIBE — Documentation" icon="document">
+    Keeps your context documents, README, and engineering docs in sync with what was actually built each day.
+  </Card>
+</CardGrid>
+
+## Why PACE?
+
+Most AI coding assistants work in isolation — they write code but can't run your tests, review CI, or check for leaked credentials. PACE closes that loop:
+
+- **Structured handoffs**: every agent reads the previous agent's output, creating a verifiable chain of evidence.
+- **Blocking gates**: a failing test or exploitable vulnerability stops the day before code ships.
+- **Advisory backlog**: non-blocking findings accumulate and are force-cleared on dedicated review days.
+- **Platform-agnostic**: GitHub, GitLab, Bitbucket, Jenkins, or fully local.
+- **LLM-agnostic**: Claude, GPT-4o, Gemini, Bedrock, Ollama, Groq, and any LiteLLM-supported model.
+
+## Explore the Docs
+
+<CardGrid>
+  <LinkCard title="Quickstart" description="Get PACE running against your repo in under 10 minutes." href="/tutorials/quickstart/" />
+  <LinkCard title="Your First Sprint" description="End-to-end walkthrough of a 5-day PACE sprint." href="/tutorials/first-sprint/" />
+  <LinkCard title="The PACE Pipeline" description="Understand how the six agents connect day by day." href="/concepts/pipeline/" />
+  <LinkCard title="pace.config.yaml Reference" description="Every configuration field explained with examples." href="/reference/pace-config-yaml/" />
+</CardGrid>

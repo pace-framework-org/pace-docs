@@ -1,0 +1,44 @@
+/* PACE Framework — Starlight custom theme overrides */
+
+:root {
+  --sl-color-accent-low: #1a2e4a;
+  --sl-color-accent: #2563eb;
+  --sl-color-accent-high: #93c5fd;
+  --sl-color-white: #ffffff;
+  --sl-color-gray-1: #f1f5f9;
+  --sl-color-gray-2: #e2e8f0;
+  --sl-color-gray-3: #94a3b8;
+  --sl-color-gray-4: #475569;
+  --sl-color-gray-5: #1e293b;
+  --sl-color-gray-6: #0f172a;
+  --sl-color-black: #020617;
+}
+
+:root[data-theme='dark'] {
+  --sl-color-accent-low: #0f2040;
+  --sl-color-accent: #3b82f6;
+  --sl-color-accent-high: #bfdbfe;
+}
+
+/* Agent badges used inline in docs */
+.agent-badge {
+  display: inline-block;
+  padding: 0.15em 0.5em;
+  border-radius: 4px;
+  font-family: var(--sl-font-mono);
+  font-size: 0.8em;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.agent-prime    { background: #1e3a5f; color: #93c5fd; }
+.agent-forge    { background: #3b2a1a; color: #fbbf24; }
+.agent-gate     { background: #1a3a1a; color: #86efac; }
+.agent-sentinel { background: #3a1a1a; color: #fca5a5; }
+.agent-conduit  { background: #2a1a3a; color: #c4b5fd; }
+.agent-scribe   { background: #1a2e4a; color: #7dd3fc; }
+
+/* Decision callout colors */
+.decision-ship { border-left: 4px solid #22c55e; }
+.decision-hold { border-left: 4px solid #ef4444; }
+.decision-advisory { border-left: 4px solid #f59e0b; }
