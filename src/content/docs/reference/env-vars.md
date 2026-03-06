@@ -60,6 +60,20 @@ For LiteLLM, the variable name expected by each provider may vary. `LLM_API_KEY`
 | `JENKINS_TOKEN` | Yes | Jenkins API token (not password). Generate in Jenkins → User → Configure → API Token. |
 | `JENKINS_JOB_NAME` | Yes | Job or pipeline name to poll (e.g. `my-app/main`). |
 
+### Jira
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `JIRA_URL` | Yes | Base URL of your Jira Cloud instance — e.g. `https://mycompany.atlassian.net`. No trailing slash. |
+| `JIRA_EMAIL` | Yes | Atlassian account email used for Basic auth. |
+| `JIRA_TOKEN` | Yes | API token. Create at [id.atlassian.com → Security → API tokens](https://id.atlassian.com/manage-profile/security/api-tokens). |
+| `JIRA_PROJECT_KEY` | Yes | Jira project key (e.g. `ENG`, `PAY`). Shown next to the project name in Jira. |
+| `JIRA_HOLD_ISSUE_TYPE` | No | Issue type for HOLD escalation tickets. Default: `Bug`. |
+| `JIRA_HOLD_PRIORITY` | No | Priority for HOLD tickets. Default: `High`. |
+| `JIRA_ADVISORY_ISSUE_TYPE` | No | Issue type for advisory finding tickets. Default: `Task`. |
+| `JIRA_ADVISORY_PRIORITY` | No | Priority for advisory tickets. Default: `Medium`. |
+| `JIRA_REVIEW_ISSUE_TYPE` | No | Issue type for review gate tickets. Default: `Task`. |
+
 ### Local
 
 No environment variables required.

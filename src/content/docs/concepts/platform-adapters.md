@@ -5,7 +5,7 @@ sidebar:
   order: 4
 ---
 
-PACE needs to interact with your Git hosting platform for four operations: opening pull requests, filing escalation issues, polling CI results, and writing job summaries. The **PlatformAdapter** interface abstracts all of these behind a common API so that PACE works the same way on GitHub, GitLab, Bitbucket, Jenkins, or fully locally.
+PACE needs to interact with your Git hosting platform for five operations: opening pull requests, filing escalation issues, pushing advisory findings, polling CI results, and writing job summaries. The **PlatformAdapter** interface abstracts all of these behind a common API so that PACE works the same way on GitHub, GitLab, Bitbucket, Jenkins, Jira, or fully locally.
 
 ## Why a platform adapter?
 
@@ -17,10 +17,14 @@ Without an adapter layer, every agent that needed CI data or wanted to open a PR
 class PlatformAdapter(ABC):
 
     def open_review_pr(self, day: int, pace_dir: Path) -> str:
-        """Create a PR/MR for today's implementation. Returns the PR URL."""
+        """Create a PR/MR for a human gate day. Returns the PR/MR URL."""
 
     def open_escalation_issue(self, day: int, day_dir: Path) -> str:
-        """Create an issue for unresolved advisories. Returns the issue URL."""
+        """Open a blocking ticket when all retries are exhausted. Returns URL."""
+
+    def push_advisory_items(self, day: int, items: list[dict], agent: str) -> str:
+        """Open a non-blocking ticket for backlisted advisory findings. Returns URL.
+        Only called when advisory.push_to_issues: true in pace.config.yaml."""
 
     def wait_for_commit_ci(
         self,
@@ -56,6 +60,20 @@ GATE treats:
 - `"timeout"` or `"no_runs"` → PARTIAL (if out_of_scope) or FAIL
 
 ## Available adapters
+
+### JiraAdapter
+
+Uses the Jira Cloud REST API v3 with Basic Auth (email + API token).
+
+- **Review gate**: `POST /rest/api/3/issue` — creates a Task with sprint summary
+- **HOLD escalation**: `POST /rest/api/3/issue` — creates a Bug with full YAML artifacts
+- **Advisory findings**: `POST /rest/api/3/issue` — creates a Task per backlisted batch (requires `advisory.push_to_issues: true`)
+- **CI**: not supported — returns `{"conclusion": "no_runs"}` immediately
+- **Job summary**: writes to `pace-summary.md`
+
+Descriptions use [Atlassian Document Format (ADF)](https://developer.atlassian.com/cloud/jira/platform/apis/document/structure/) with syntax-highlighted YAML code blocks.
+
+See [Connect PACE to Jira](/guides/jira-adapter/) for setup.
 
 ### GitHubAdapter
 

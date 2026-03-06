@@ -24,6 +24,7 @@ export default defineConfig({
             { label: 'Overview', link: '/' },
             { label: 'Quickstart', link: '/tutorials/quickstart/' },
             { label: 'Your First Sprint', link: '/tutorials/first-sprint/' },
+            { label: 'Add PACE to an Existing Project', link: '/tutorials/existing-project/' },
           ],
         },
         {
@@ -34,6 +35,8 @@ export default defineConfig({
             { label: 'Switch Platform', link: '/guides/switch-platform/' },
             { label: 'Write a Sprint Plan', link: '/guides/write-a-sprint-plan/' },
             { label: 'Set Human Gate Days', link: '/guides/set-human-gate-days/' },
+            { label: 'Push Advisory Findings to Issues', link: '/guides/push-advisory-to-issues/' },
+            { label: 'Connect PACE to Jira', link: '/guides/jira-adapter/' },
             { label: 'Add a New Platform', link: '/guides/add-a-new-platform/' },
             { label: 'Add a New LLM Provider', link: '/guides/add-a-new-llm/' },
           ],

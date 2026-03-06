@@ -122,14 +122,40 @@ A clearance day with any FAIL from an unresolved advisory is treated as a HOLD �
 
 ## Escalation to issues
 
-At the end of a sprint (or when a HOLD cannot be resolved within the day), unresolved advisories are escalated to a platform issue:
+By default, advisory findings accumulate only in the local `.pace/advisory_backlog.yaml` file. You can optionally have PACE open an issue in your platform's issue tracker each time findings are backlisted.
 
-```
-Platform issue title: "PACE Sprint Advisory Escalations — Day 5"
-Body: lists each unresolved advisory with its source day, agent, and evidence
+### Enable advisory issue push
+
+Set in `pace/pace.config.yaml`:
+
+```yaml
+advisory:
+  push_to_issues: true
 ```
 
-This ensures advisories don't silently disappear at sprint end.
+When enabled, each time findings are added to the backlog (after the retry was given but the issue persisted), the orchestrator opens one issue per batch per agent per day.
+
+### Advisory issues vs. HOLD escalation issues
+
+| | Advisory issue | HOLD escalation issue |
+| --- | --- | --- |
+| **Trigger** | Finding persists after one retry | All retries exhausted — sprint blocked |
+| **Blocking** | No | Yes (`PACE_PAUSED=true`) |
+| **Default** | Off — opt in | Always on |
+
+HOLD escalation issues are always created when the pipeline fails after all retries, regardless of `push_to_issues`. Advisory issues are opt-in because teams vary in how much noise they want from PACE in their issue tracker.
+
+### Issue content
+
+Advisory issues include:
+
+- The finding ID, source day, and agent (`SENTINEL` or `CONDUIT`)
+- The full finding text as originally reported
+- Instructions for the clearance day resolution process
+
+Labels applied: `pace-advisory`, `pace-sentinel`/`pace-conduit`, `day-N` (or Jira equivalents).
+
+For platform-specific details and setup, see [Push Advisory Findings to Issue Trackers](/guides/push-advisory-to-issues/).
 
 ## Designing your clearance schedule
 

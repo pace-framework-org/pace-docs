@@ -105,9 +105,9 @@ platform:
   type: github
 ```
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `type` | string | Yes | Platform adapter to use. One of: `github`, `gitlab`, `bitbucket`, `jenkins`, `local`. |
+| Field  | Type   | Required | Description                                    |
+|--------|--------|----------|------------------------------------------------|
+| `type` | string | Yes      | Platform adapter to use. See table below.      |
 
 ### Platform type details
 
@@ -117,9 +117,29 @@ platform:
 | `gitlab` | GitLab MR | GitLab Issue | GitLab Pipelines API | `$CI_JOB_SUMMARY` or file |
 | `bitbucket` | Bitbucket PR | Bitbucket Issue | Bitbucket Pipelines API | `pace-summary.md` |
 | `jenkins` | Local file | Local file | Jenkins REST API | `jenkins-summary.md` |
+| `jira` | Jira Task | Jira Bug/Task | Not supported (`no_runs`) | `pace-summary.md` |
 | `local` | Local file | Local file | Returns `no_runs` | `pace-summary.md` |
 
-See [Switch Platform](/guides/switch-platform/) for credential setup per platform.
+See [Switch Platform](/guides/switch-platform/) and [Connect PACE to Jira](/guides/jira-adapter/) for credential setup per platform.
+
+---
+
+## `advisory`
+
+```yaml
+advisory:
+  push_to_issues: false
+```
+
+Controls how non-blocking advisory findings from SENTINEL and CONDUIT are surfaced.
+
+| Field              | Type    | Required | Description                                                    |
+|--------------------|---------|----------|----------------------------------------------------------------|
+| `push_to_issues`   | boolean | No       | Open an issue per backlisted advisory batch. Default: `false`. |
+
+Advisory findings always accumulate in `.pace/advisory_backlog.yaml` regardless of this setting. The `push_to_issues` flag controls whether they are also mirrored to an external issue tracker.
+
+See [Push Advisory Findings to Issue Trackers](/guides/push-advisory-to-issues/) for details.
 
 ---
 

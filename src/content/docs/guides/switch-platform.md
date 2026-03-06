@@ -123,6 +123,43 @@ Jenkins has no native SHA-indexed API. PACE inspects the 20 most recent builds a
 
 ---
 
+## Jira
+
+```yaml
+platform:
+  type: jira
+```
+
+| Variable | Description |
+|----------|-------------|
+| `JIRA_URL` | Base URL of your Jira Cloud instance (e.g. `https://mycompany.atlassian.net`) |
+| `JIRA_EMAIL` | Atlassian account email |
+| `JIRA_TOKEN` | API token from [id.atlassian.com → Security → API tokens](https://id.atlassian.com/manage-profile/security/api-tokens) |
+| `JIRA_PROJECT_KEY` | Jira project key (e.g. `ENG`, `PAY`) |
+
+```bash
+export JIRA_URL="https://mycompany.atlassian.net"
+export JIRA_EMAIL="engineer@mycompany.com"
+export JIRA_TOKEN="your-api-token"
+export JIRA_PROJECT_KEY="ENG"
+# requests is already in requirements.txt — no extra install needed
+```
+
+The Jira adapter handles HOLD escalation tickets and advisory issue push. It does **not** poll CI — use this adapter when Jira is your issue tracker but CI runs on a separate system (GitHub Actions, Jenkins, etc.). The `wait_for_commit_ci` step will return `no_runs` and be skipped.
+
+Optional overrides:
+
+```bash
+export JIRA_HOLD_ISSUE_TYPE="Bug"         # default
+export JIRA_HOLD_PRIORITY="High"          # default
+export JIRA_ADVISORY_ISSUE_TYPE="Task"    # default
+export JIRA_ADVISORY_PRIORITY="Medium"    # default
+```
+
+See [Connect PACE to Jira](/guides/jira-adapter/) for the full setup guide and troubleshooting.
+
+---
+
 ## Local (no platform)
 
 ```yaml
