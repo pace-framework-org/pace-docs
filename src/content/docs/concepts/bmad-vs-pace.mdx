@@ -1,0 +1,164 @@
+---
+title: BMAD vs PACE
+description: A structured comparison of the BMAD Method and PACE Framework — two complementary approaches to AI-driven software development.
+---
+
+import { Card, CardGrid, Aside } from '@astrojs/starlight/components';
+
+Both BMAD and PACE use specialised AI agents to drive software development. They solve different problems at different points in the delivery lifecycle — and are designed to complement each other rather than compete.
+
+---
+
+## One-line summary
+
+| | BMAD | PACE |
+| --- | --- | --- |
+| **What it is** | A human-guided, documentation-first design framework | An autonomous daily execution loop |
+| **You drive it by** | Invoking personas in a chat or IDE session | Committing a sprint plan and letting CI/CD run it |
+| **Primary output** | PRD, architecture docs, user stories | Shipped code, test results, security/DevOps reports |
+| **Source of truth** | Documentation (docs-as-code philosophy) | Working software that passes the gate pipeline |
+
+---
+
+## Philosophy
+
+### BMAD — documentation-first, human-steered
+
+BMAD treats documentation as the primary source of truth. Before a line of code is written, specialised AI personas collaborate to produce a Product Requirements Document, an architecture design, and a breakdown of user stories. Code is a downstream derivative of these specifications.
+
+You steer the process. You invoke the Analyst to clarify the problem, the PM to draft the PRD, the Architect to produce a system design, and the Developer to implement each story. BMAD provides the structure and the personas — you provide the judgment at each handoff.
+
+This makes BMAD exceptionally strong for:
+- Greenfield project setup where the problem space is not yet well-defined
+- Large, complex systems where architectural decisions must be explicit and auditable
+- Teams that want human review and approval at every major phase
+
+### PACE — autonomous daily execution
+
+PACE treats the sprint plan as the source of truth. Once you define what each day must deliver, PACE runs the full pipeline automatically: it plans the story, writes and tests the code, reviews for security issues, checks CI/CD configuration, and either ships or escalates — without requiring human input between cycles.
+
+The daily loop is the product. PACE is designed to run unattended in your CI/CD system and surfaces problems (via escalation issues and job summaries) rather than waiting for you to ask.
+
+This makes PACE exceptionally strong for:
+- Sustained daily delivery over a defined sprint
+- Teams or founders who want consistent forward momentum without manual prompting
+- Projects where the scope is defined and the goal is execution speed with quality gates
+
+---
+
+## Agent and persona comparison
+
+| BMAD Agent | Role | PACE Equivalent | Key difference |
+| --- | --- | --- | --- |
+| **Analyst** | Captures problem space, constraints, one-page PRD | — | PACE assumes the plan is already defined in `plan.yaml` |
+| **Product Manager** | Expands PRD into full requirements and acceptance criteria | **PRIME** | PRIME generates a daily Story Card from the plan; PM produces the full PRD upfront |
+| **Architect** | Designs system structure, tech choices, interfaces | — | PACE relies on SCRIBE-generated `engineering.md` context; no separate design phase |
+| **Scrum Master** | Breaks stories into tasks, manages sprint board | — | PACE's `plan.yaml` is the sprint board; orchestrator manages sequencing |
+| **Developer** | Implements stories in an agentic tool loop | **FORGE** | FORGE adds TDD enforcement (Red → Green → Refactor) and a structural `confirm_red_phase` checkpoint |
+| **QA** | Reviews test coverage, raises quality issues | **GATE** | GATE runs the actual test suite and validates every acceptance criterion against CI results |
+| — | — | **SENTINEL** | No BMAD equivalent. Reviews for hardcoded secrets, input validation gaps, missing timeouts |
+| — | — | **CONDUIT** | No BMAD equivalent. Reviews CI/CD workflows, lock files, deployment configuration |
+| — | — | **SCRIBE** | Generates and maintains `product.md`, `engineering.md`, `security.md`, `devops.md` context documents |
+
+---
+
+## Workflow comparison
+
+### BMAD workflow
+
+```
+Human → Analyst → PRD → PM → Stories → Architect → Design → Developer → Code → QA
+         ↑ You invoke each step manually and review output before moving forward
+```
+
+Each phase is explicit and gated by human judgment. The AI produces artefacts; you decide when they are good enough to proceed.
+
+### PACE workflow
+
+```
+plan.yaml → PRIME → FORGE → GATE → SENTINEL → CONDUIT → SHIP
+                      ↑                                     |
+                    HOLD ←──────────────────────────────────┘
+                   (retry up to 2× before escalation)
+```
+
+The cycle runs daily, triggered by your CI/CD scheduler. Human judgment is invoked only on designated **human gate days** (e.g. Day 14, Day 28) or when retries are exhausted and an escalation issue is opened.
+
+---
+
+## CI/CD and automation
+
+| | BMAD | PACE |
+| --- | --- | --- |
+| **Runs in CI/CD** | No — runs in a chat session or IDE | Yes — GitHub Actions, GitLab CI, Bitbucket, Jenkins |
+| **Scheduled execution** | No | Yes — daily cron or manual dispatch |
+| **Test suite integration** | Advisory (Developer persona is prompted to write tests) | Mandatory — GATE blocks SHIP if tests fail |
+| **Security review** | Optional (Developer or QA persona may flag issues) | Mandatory — SENTINEL blocks on exploitable vulnerabilities |
+| **CI pipeline review** | Not covered | Mandatory — CONDUIT flags broken workflows and leaked secrets |
+| **Escalation mechanism** | Human review in chat | Opens a GitHub/GitLab/Bitbucket issue; sets `PACE_PAUSED=true` |
+| **Advisory backlog** | Not built in | `.pace/advisory_backlog.yaml`, force-cleared every 7th day |
+
+---
+
+## LLM and tooling support
+
+| | BMAD | PACE |
+| --- | --- | --- |
+| **Recommended AI** | Claude Code (CLI), Cursor, Windsurf, ChatGPT | Anthropic Claude (default), any LiteLLM-supported model |
+| **Model requirement** | Large context window required (PRDs can be large) | Any model that supports tool-use / function calling |
+| **Custom personas** | Yes — defined as Agent-as-Code Markdown files | No — agent system prompts are in Python source |
+| **"Party Mode"** | Yes — multiple personas in one session | No — agents run sequentially in the pipeline |
+
+---
+
+## When to choose each
+
+<CardGrid>
+  <Card title="Choose BMAD when..." icon="pencil">
+    - Starting a greenfield project with an undefined problem space
+    - You need a full PRD, architecture document, and story breakdown before writing code
+    - Your team wants human review and approval at every major phase
+    - You are making high-stakes architectural decisions that need explicit documentation
+    - Context and design traceability are primary concerns (governance, compliance)
+  </Card>
+  <Card title="Choose PACE when..." icon="rocket">
+    - The plan is defined and the goal is consistent daily execution
+    - You want code written, tested, security-reviewed, and shipped automatically
+    - You need unattended CI/CD integration with escalation on failure
+    - You want enforced TDD, mandatory security and DevOps gates on every cycle
+    - You are a solo founder or small team without bandwidth to manually drive each AI step
+  </Card>
+</CardGrid>
+
+---
+
+## Using BMAD and PACE together
+
+<Aside type="tip" title="Recommended workflow for new projects">
+BMAD and PACE are designed for different phases — they combine naturally.
+</Aside>
+
+**Sprint 0 — use BMAD:**
+1. Run the Analyst persona to clarify the problem and produce a one-page brief
+2. Run the PM persona to produce the full PRD with acceptance criteria
+3. Run the Architect persona to produce the system design and tech stack decisions
+4. Run the Scribe/SM persona to break the work into a 30-day story list
+
+**Sprint 1-N — use PACE:**
+1. Translate the BMAD story list into `pace/plan.yaml`
+2. Copy the architectural context into the relevant sections SCRIBE will generate (or pre-seed `.pace/context/`)
+3. Trigger the PACE pipeline — PRIME, FORGE, GATE, SENTINEL, and CONDUIT run daily from here
+
+The BMAD phase produces the artefacts that make PACE's daily loop well-directed. The PACE phase produces the working software that validates the BMAD design decisions.
+
+---
+
+## Summary
+
+| Dimension | BMAD | PACE |
+| --- | --- | --- |
+| Primary phase | Design and planning | Execution and delivery |
+| Human involvement | High — drives every step | Low — sets plan, reviews gates and escalations |
+| Automation depth | Low (design artefacts) | High (code, tests, CI, security, DevOps) |
+| Best for | Problem definition, architecture, complex systems | Sustained daily delivery, quality-gated sprints |
+| Complementary? | Yes — ideal Sprint 0 to PACE's Sprint 1+ | Yes — PACE executes what BMAD designs |

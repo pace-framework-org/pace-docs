@@ -69,6 +69,7 @@ export default defineConfig({
             { label: 'SCRIBE & Context Documents', link: '/concepts/scribe-and-context/' },
             { label: 'Platform Adapters', link: '/concepts/platform-adapters/' },
             { label: 'LLM Adapters', link: '/concepts/llm-adapters/' },
+            { label: 'BMAD vs PACE', link: '/concepts/bmad-vs-pace/' },
           ],
         },
         {
