@@ -8,7 +8,7 @@ export default defineConfig({
       description: 'AI-driven sprint execution for software teams. Plan · Architect · Code · Evaluate.',
       logo: {
         src: './src/assets/pace-logo.svg',
-        replacesTitle: false,
+        replacesTitle: true,
       },
       social: {
         github: 'https://github.com/pace-framework-org/pace-framework-starter',
