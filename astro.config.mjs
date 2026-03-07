@@ -6,6 +6,10 @@ export default defineConfig({
     starlight({
       title: 'PACE Framework',
       description: 'AI-driven sprint execution for software teams. Plan · Architect · Code · Evaluate.',
+      favicon: {
+        href: '/favicon.svg',
+        type: 'image/svg+xml',
+      },
       logo: {
         light: './src/assets/pace-logo-light.svg',
         dark: './src/assets/pace-logo-dark.svg',
