@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Background -->
+  <rect width="32" height="32" rx="6" fill="#0f172a"/>
+  <!-- Three forward-pointing triangles — pipeline mark -->
+  <polygon points="3,6 3,26 13,16" fill="#1e40af"/>
+  <polygon points="14,8 14,24 22,16" fill="#3b82f6"/>
+  <polygon points="23,10 23,22 30,16" fill="#93c5fd"/>
+</svg>
