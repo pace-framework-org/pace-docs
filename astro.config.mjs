@@ -28,6 +28,24 @@ export default defineConfig({
           ],
         },
         {
+          label: 'Language Stack Tutorials',
+          items: [
+            { label: 'Java (Spring Boot)', link: '/tutorials/java/' },
+            { label: 'C# (.NET)', link: '/tutorials/csharp/' },
+            { label: 'Node.js / TypeScript', link: '/tutorials/nodejs/' },
+            { label: 'Go', link: '/tutorials/go/' },
+          ],
+        },
+        {
+          label: 'Platform Integration Tutorials',
+          items: [
+            { label: 'GitHub Actions', link: '/tutorials/github-actions/' },
+            { label: 'GitLab CI/CD', link: '/tutorials/gitlab-cicd/' },
+            { label: 'Jenkins', link: '/tutorials/jenkins/' },
+            { label: 'Bitbucket Pipelines', link: '/tutorials/bitbucket-pipelines/' },
+          ],
+        },
+        {
           label: 'How-To Guides',
           items: [
             { label: 'Configure Your Project', link: '/guides/configure-your-project/' },
