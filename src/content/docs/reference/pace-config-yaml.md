@@ -179,6 +179,27 @@ See [Switch LLM Provider](/guides/switch-llm-provider/) for provider credential 
 
 ---
 
+## `cost_control`
+
+```yaml
+cost_control:
+  max_story_ac: 5
+  max_story_cost_usd: 1.50
+```
+
+Controls proactive story scoping. When a story exceeds either threshold, PRIME is automatically re-invoked to split it: today's story carries the highest-value criteria (up to `max_story_ac`), and the remainder is written to `.pace/day-N/deferred_scope.yaml` for the next day's PRIME to pick up automatically.
+
+| Field                | Type    | Required | Description                                                                                                        |
+|----------------------|---------|----------|--------------------------------------------------------------------------------------------------------------------|
+| `max_story_ac`       | integer | No       | Trigger PRIME refinement if AC count exceeds this. `0` to disable. Default: `5`.                                  |
+| `max_story_cost_usd` | float   | No       | Trigger PRIME refinement if SCOPE predicts FORGE cost exceeds this (USD). `0` to disable. Default: `0` (disabled). |
+
+Up to 2 refinement rounds are attempted. If refinement fails, FORGE runs on the original story as a fallback.
+
+See [Proactive Story Scoping](/guides/story-scoping/) for details and threshold tuning guidance.
+
+---
+
 ## Full annotated example
 
 ```yaml
@@ -222,4 +243,8 @@ llm:
   model: claude-sonnet-4-6
   analysis_model: claude-haiku-4-5-20251001
   base_url: null
+
+cost_control:
+  max_story_ac: 5
+  max_story_cost_usd: 1.50
 ```

@@ -58,6 +58,7 @@ export default defineConfig({
             { label: 'Set Human Gate Days', link: '/guides/set-human-gate-days/' },
             { label: 'Push Advisory Findings to Issues', link: '/guides/push-advisory-to-issues/' },
             { label: 'Control Daily API Spend', link: '/guides/budget-cap/' },
+            { label: 'Proactive Story Scoping', link: '/guides/story-scoping/' },
             { label: 'Connect PACE to Jira', link: '/guides/jira-adapter/' },
             { label: 'Add a New Platform', link: '/guides/add-a-new-platform/' },
             { label: 'Add a New LLM Provider', link: '/guides/add-a-new-llm/' },
