@@ -83,6 +83,15 @@ export default defineConfig({
             { label: 'CLI Commands', link: '/reference/cli/' },
           ],
         },
+        {
+          label: 'Contributing',
+          items: [
+            { label: 'Overview', link: '/contributing/overview/' },
+            { label: 'Dev Environment Setup', link: '/contributing/dev-setup/' },
+            { label: 'Commit Signing', link: '/contributing/commit-signing/' },
+            { label: 'Submit a Pull Request', link: '/contributing/submit-a-pr/' },
+          ],
+        },
       ],
     }),
   ],
