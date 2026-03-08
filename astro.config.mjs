@@ -52,6 +52,7 @@ export default defineConfig({
           label: 'How-To Guides',
           items: [
             { label: 'Configure Your Project', link: '/guides/configure-your-project/' },
+            { label: 'Day 0 — Sprint Planning', link: '/guides/day-zero/' },
             { label: 'Switch LLM Provider', link: '/guides/switch-llm-provider/' },
             { label: 'Switch Platform', link: '/guides/switch-platform/' },
             { label: 'Write a Sprint Plan', link: '/guides/write-a-sprint-plan/' },
