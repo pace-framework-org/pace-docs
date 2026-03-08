@@ -27,6 +27,19 @@ On exit (success, hold, or abort):
 
 The current run is **never interrupted mid-flight**. Only the next cron trigger is affected.
 
+## Manual runs bypass the cap
+
+`workflow_dispatch` triggers (runs you start manually from the GitHub Actions UI or the `gh` CLI) **always proceed** regardless of the daily budget. The budget check is intentionally bypassed:
+
+```text
+[PACE] Manual trigger — budget check bypassed.
+```
+
+This means:
+
+- A human explicitly requesting a run will never be silently blocked.
+- The cost of that manual run **is still tracked** and added to `PACE_DAILY_SPEND`, so the next scheduled cron will see the updated total.
+
 ## Setup
 
 ### 1 — Set the daily budget variable
