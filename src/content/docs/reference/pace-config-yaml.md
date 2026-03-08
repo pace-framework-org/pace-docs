@@ -149,13 +149,15 @@ See [Push Advisory Findings to Issue Trackers](/guides/push-advisory-to-issues/)
 llm:
   provider: anthropic
   model: claude-sonnet-4-6
+  analysis_model: claude-haiku-4-5-20251001
   base_url: null
 ```
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `provider` | string | Yes | LLM adapter to use. One of: `anthropic`, `litellm`. Default: `anthropic`. |
-| `model` | string | Yes | Model identifier. For `litellm`, include the provider prefix (e.g. `openai/gpt-4o`). |
+| `model` | string | Yes | Model identifier. For `litellm`, include the provider prefix (e.g. `openai/gpt-4o`). Used by FORGE and SCRIBE. |
+| `analysis_model` | string \| null | No | Model for PRIME, GATE, SENTINEL, CONDUIT. Defaults to `model` if not set. Use a cheaper model (e.g. `claude-haiku-4-5-20251001`) to reduce cost without sacrificing quality on analytical tasks. |
 | `base_url` | string \| null | No | Optional API endpoint override. Required for self-hosted Ollama. Default: `null`. |
 
 ### Model examples
@@ -218,5 +220,6 @@ platform:
 llm:
   provider: anthropic
   model: claude-sonnet-4-6
+  analysis_model: claude-haiku-4-5-20251001
   base_url: null
 ```

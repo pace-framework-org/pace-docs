@@ -73,6 +73,28 @@ while True:
         break
 ```
 
+## Two model tiers
+
+PACE agents fall into two cost tiers based on what they do:
+
+| Tier | Agents | Factory | Config key | Why |
+| ---- | ------ | ------- | ---------- | --- |
+| Code generation | FORGE, SCRIBE | `get_llm_adapter()` | `llm.model` | Multi-step tool-calling loops; requires strong reasoning |
+| Analytical | PRIME, GATE, SENTINEL, CONDUIT | `get_analysis_adapter()` | `llm.analysis_model` | Single-call structured YAML generation; cheaper models perform well |
+
+Configure in `pace.config.yaml`:
+
+```yaml
+llm:
+  provider: anthropic
+  model: claude-sonnet-4-6           # FORGE + SCRIBE
+  analysis_model: claude-haiku-4-5-20251001  # PRIME, GATE, SENTINEL, CONDUIT
+```
+
+If `analysis_model` is omitted, `get_analysis_adapter()` falls back to `model` — no behaviour change for existing deployments.
+
+On a typical day with one SHIP attempt, analytical agents account for 3–4 API calls vs FORGE's 10–25. Switching analytical agents to Haiku reduces per-run cost by ~40–50% for Anthropic-backed deployments.
+
 ## ChatResponse and ToolCall
 
 `adapter.chat()` always returns a `ChatResponse`:
@@ -159,9 +181,13 @@ See [Switch LLM Provider](/guides/switch-llm-provider/) for provider-specific co
 ## How the adapter is selected
 
 ```python
-from llm import get_llm_adapter
+from llm import get_llm_adapter, get_analysis_adapter
 
-adapter = get_llm_adapter()  # reads cfg.llm.provider
+# FORGE and SCRIBE: uses llm.model (strong reasoning for code generation)
+adapter = get_llm_adapter()
+
+# PRIME, GATE, SENTINEL, CONDUIT: uses llm.analysis_model (analytical tasks)
+adapter = get_analysis_adapter()
 ```
 
 The factory reads `llm.provider` from `pace.config.yaml` and instantiates the correct adapter. The API key always comes from environment variables.

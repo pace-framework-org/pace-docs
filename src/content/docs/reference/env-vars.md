@@ -80,6 +80,35 @@ No environment variables required.
 
 ---
 
+## Budget control
+
+PACE tracks API token costs and can skip cron runs when a configurable daily limit is reached. Set these as **GitHub Actions repository variables** (Settings → Variables → Actions), not secrets.
+
+| Variable | Who sets it | Description |
+| -------- | ----------- | ----------- |
+| `PACE_DAILY_BUDGET` | You | Maximum USD spend per calendar day. Set to `0` or leave unset for unlimited. Example: `15` |
+| `PACE_DAILY_SPEND` | PACE (auto) | Running total of estimated API spend today. Reset automatically at midnight UTC. **Do not set manually.** |
+| `PACE_DAILY_SPEND_DATE` | PACE (auto) | ISO date when `PACE_DAILY_SPEND` was last updated. Used to detect day rollovers. **Do not set manually.** |
+| `PACE_SPEND_TODAY` | pace.yml (auto) | Prior accumulated spend before the current run starts. Injected into the orchestrator by the budget-check step. Not a persistent variable — do not set manually. |
+
+:::note
+When `PACE_DAILY_BUDGET` is exceeded, the `Run PACE cycle` step is **skipped**, not failed. The current workflow run continues normally. Only subsequent cron triggers are blocked until the counter resets the next day.
+:::
+
+Each completed run logs a per-model cost breakdown:
+
+```text
+[PACE] API usage this run:
+  claude-haiku-4-5-20251001: 45,230 in + 8,912 out = $0.0718
+  claude-sonnet-4-6: 124,500 in + 31,200 out = $0.8430
+  Run total: $0.9148
+[PACE] Daily spend updated: $2.14 (this run: $0.9148)
+```
+
+See [Control Daily API Spend](/guides/budget-cap/) for setup instructions.
+
+---
+
 ## GitHub Actions integration
 
 When running PACE inside a GitHub Actions workflow, most variables are provided automatically:

@@ -101,11 +101,13 @@ See [Switch Platform](/guides/switch-platform/) for per-platform credential setu
 llm:
   provider: anthropic
   model: claude-sonnet-4-6
+  analysis_model: claude-haiku-4-5-20251001
   base_url: null
 ```
 
 - **`provider`** — `anthropic` (default) or `litellm`.
-- **`model`** — model name. For `litellm`, prefix with the provider (e.g. `openai/gpt-4o`).
+- **`model`** — model name. For `litellm`, prefix with the provider (e.g. `openai/gpt-4o`). Used by FORGE and SCRIBE.
+- **`analysis_model`** — optional; model for PRIME, GATE, SENTINEL, CONDUIT (single-call analytical agents). Defaults to `model`. Use a cheaper model here to reduce cost by ~40–50% without affecting code quality.
 - **`base_url`** — optional endpoint override (e.g. `http://localhost:11434` for Ollama).
 
 See [Switch LLM Provider](/guides/switch-llm-provider/) for examples.
@@ -122,6 +124,16 @@ After SCRIBE runs, it creates/updates context files in `.pace/context/`:
 | `product.md` | Product decisions, PRIME uses this |
 
 You can pre-populate these files before Day 1 to give agents better starting context.
+
+## Budget cap
+
+To prevent runaway API spend, set `PACE_DAILY_BUDGET` as a GitHub Actions repository variable (Settings → Variables → Actions):
+
+| Variable | Example value | Effect |
+| -------- | ------------- | ------ |
+| `PACE_DAILY_BUDGET` | `15` | Skip cron runs once $15 is spent today |
+
+Leave unset or set to `0` for unlimited spend. See [Control Daily API Spend](/guides/budget-cap/) for details.
 
 ## Validating your configuration
 
