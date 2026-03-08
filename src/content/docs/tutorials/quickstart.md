@@ -5,7 +5,7 @@ sidebar:
   order: 1
 ---
 
-This guide takes you from zero to a working PACE setup. By the end you will have PACE installed, configured, and ready to run Day 1 of a sprint.
+This guide takes you from zero to a working PACE setup. By the end you will have PACE installed, configured, a sprint plan written, and Day 0 (planning) complete — with per-story cost estimates pre-populated in `PROGRESS.md` and Day 1 ready to run.
 
 ## Prerequisites
 
@@ -124,11 +124,37 @@ days:
 
 See [Write a Sprint Plan](/guides/write-a-sprint-plan/) for the full plan format.
 
-## 6 — Run Day 1
+## 6 — Run Day 0 (sprint planning)
+
+Day 0 is the planning phase. It estimates the cost of every story in your sprint plan and pre-populates `PROGRESS.md` — no code is written.
 
 ```bash
-cd pace
-python pace/orchestrator.py --day 1
+PACE_DAY=0 python pace/orchestrator.py
+```
+
+PACE will call the **PLANNER** agent once per sprint day (~$0.005 each) and produce:
+
+- `.pace/day-0/planner.md` — per-day cost estimates + sprint total
+- `PROGRESS.md` — pre-filled with **Est. Cost** column for every day
+
+Example output:
+
+```text
+[PACE] Day 0: Estimating cost for 5 sprint days...
+[PACE]   Day 1: ~$0.45 — Simple scaffold with 1-2 files.
+[PACE]   Day 2: ~$0.80 — Medium complexity with flag wiring.
+[PACE]   Day 3: ~$0.55 — Straightforward delta calculation.
+[PACE]   Day 4: ~$0.50 — Two code paths, one test fixture.
+[PACE]   Day 5: ~$1.10 — End-to-end integration, more files.
+[PACE] Day 0: Total estimated sprint cost: $3.40
+```
+
+See [Day 0 — Sprint Planning](/guides/day-zero/) for details.
+
+## 7 — Run Day 1
+
+```bash
+PACE_DAY=1 python pace/orchestrator.py
 ```
 
 PACE will:
@@ -139,10 +165,11 @@ PACE will:
 5. **CONDUIT** — review your CI/CD configuration
 6. **SCRIBE** — update documentation and context files
 
-All outputs are saved to `.pace/day-1/`.
+All outputs are saved to `.pace/day-1/`. After Day 1 ships, `PROGRESS.md` is updated with the actual FORGE cost alongside the Day 0 estimate.
 
 ## What's next?
 
 - [Your First Sprint](/tutorials/first-sprint/) — full walkthrough of a 5-day sprint
+- [Day 0 — Sprint Planning](/guides/day-zero/) — cost estimation deep dive
 - [The PACE Pipeline](/concepts/pipeline/) — understand how agents communicate
 - [pace.config.yaml Reference](/reference/pace-config-yaml/) — every configuration field
