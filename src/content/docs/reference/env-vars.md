@@ -96,6 +96,19 @@ PACE tracks API token costs and can skip cron runs when a configurable daily lim
 When `PACE_DAILY_BUDGET` is exceeded, the `Run PACE cycle` step is **skipped**, not failed. The current workflow run continues normally. Only subsequent cron triggers are blocked until the counter resets the next day.
 :::
 
+---
+
+## Story scoping
+
+PACE can automatically refine stories that are predicted to exceed a cost or complexity threshold before FORGE runs. Set these as **GitHub Actions repository variables**.
+
+| Variable | Default | Description |
+| -------- | ------- | ----------- |
+| `PACE_MAX_STORY_COST_USD` | `1.50` | If the SCOPE agent predicts a story will cost more than this (USD), PRIME is asked to refine or split it before FORGE runs. Raise to `2.00`+ for sprints with known high-complexity integration days. |
+| `PACE_MAX_STORY_AC` | `5` | If a story has more acceptance criteria than this, PRIME is asked to reduce scope before FORGE runs. |
+
+See [Proactive Story Scoping](/guides/story-scoping/) for how SCOPE and PRIME refinement interact.
+
 Each completed run logs a per-model cost breakdown:
 
 ```text
