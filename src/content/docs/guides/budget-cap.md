@@ -98,7 +98,9 @@ A `PACE_DAILY_BUDGET` of `$10–15` comfortably covers 4× daily cron runs on no
 
 ## Day rollover
 
-`PACE_DAILY_SPEND` resets automatically at the start of the first cron run on a new UTC calendar day — no manual intervention needed. The budget-check step compares `PACE_DAILY_SPEND_DATE` to today's date and resets the counter if they differ.
+`PACE_DAILY_SPEND` resets automatically at the start of the first cron run on a new calendar day — no manual intervention needed. The budget-check step compares `PACE_DAILY_SPEND_DATE` to today's date (in the configured timezone) and resets the counter if they differ.
+
+The rollover timezone is controlled by the `PACE_REPORTER_TIMEZONE` repository variable (IANA format, e.g. `Asia/Kolkata`, `America/New_York`). It defaults to `UTC` if unset. Set it to match the `reporter.timezone` field in your `pace.config.yaml` so the budget day aligns with your team's calendar day rather than UTC midnight.
 
 ## Troubleshooting
 

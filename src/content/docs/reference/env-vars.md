@@ -87,7 +87,8 @@ PACE tracks API token costs and can skip cron runs when a configurable daily lim
 | Variable | Who sets it | Description |
 | -------- | ----------- | ----------- |
 | `PACE_DAILY_BUDGET` | You | Maximum USD spend per calendar day. Set to `0` or leave unset for unlimited. Example: `15` |
-| `PACE_DAILY_SPEND` | PACE (auto) | Running total of estimated API spend today. Reset automatically at midnight UTC. **Do not set manually.** |
+| `PACE_REPORTER_TIMEZONE` | You | IANA timezone for the budget day rollover (e.g. `Asia/Kolkata`, `America/New_York`). Defaults to `UTC`. Should match `reporter.timezone` in `pace.config.yaml`. |
+| `PACE_DAILY_SPEND` | PACE (auto) | Running total of estimated API spend today. Reset automatically at midnight in the configured timezone. **Do not set manually.** |
 | `PACE_DAILY_SPEND_DATE` | PACE (auto) | ISO date when `PACE_DAILY_SPEND` was last updated. Used to detect day rollovers. **Do not set manually.** |
 | `PACE_SPEND_TODAY` | pace.yml (auto) | Prior accumulated spend before the current run starts. Injected into the orchestrator by the budget-check step. Not a persistent variable — do not set manually. |
 
