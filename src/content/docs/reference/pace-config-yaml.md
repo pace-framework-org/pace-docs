@@ -179,6 +179,25 @@ See [Switch LLM Provider](/guides/switch-llm-provider/) for provider credential 
 
 ---
 
+## `reporter`
+
+```yaml
+reporter:
+  timezone: "UTC"
+```
+
+Controls output formatting for PROGRESS.md and GitHub Actions job summaries.
+
+| Field      | Type   | Required | Description                                   |
+|------------|--------|----------|-----------------------------------------------|
+| `timezone` | string | No       | IANA timezone for timestamps. Default: `UTC`. |
+
+:::tip
+Set `reporter.timezone` to your team's local timezone (e.g. `Asia/Kolkata`, `America/New_York`) so "Last updated" timestamps in PROGRESS.md and job summaries reflect your working hours, not UTC. Set the matching `PACE_REPORTER_TIMEZONE` repository variable to the same value so the daily budget rollover also aligns with your calendar day.
+:::
+
+---
+
 ## `cost_control`
 
 ```yaml
