@@ -96,6 +96,10 @@ tech:
 | `test_command`       | string         | Yes      | Command GATE runs from the repo root to execute the test suite. Must exit 0 on success. |
 | `build_command`      | string \| null | No       | Optional command run before tests (e.g. `"go build ./..."`). Default: `null`.           |
 
+:::note
+FORGE also runs `test_command` during implementation to confirm the suite exits 0 before signalling completion. See [Enforce Test Coverage](/guides/enforce-test-coverage/) for the full mandatory COVERAGE RULE.
+:::
+
 ---
 
 ## `platform`

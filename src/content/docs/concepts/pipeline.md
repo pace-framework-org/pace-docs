@@ -70,7 +70,9 @@ FORGE receives the Story Card and enters a **tool-calling loop**. It can:
 - Create and modify test files
 - Call `complete_handoff` to signal completion
 
-FORGE follows test-driven development by default: it writes tests first, then implementation. The loop continues until all acceptance criteria are met or FORGE explicitly defers.
+FORGE follows test-driven development by default: it writes tests first (Red), then implements to pass (Green), then refactors. The loop continues until all acceptance criteria are met or FORGE explicitly defers.
+
+FORGE enforces a **mandatory COVERAGE RULE**: every production file it creates or modifies must have corresponding tests in the same story. Deferred tests require an explicit `out_of_scope` entry in the story card, or GATE will HOLD. See [Enforce Test Coverage](/guides/enforce-test-coverage/) for the full rule.
 
 The **Handoff Note** records:
 - Every file written or modified (with commit SHA)
@@ -89,7 +91,7 @@ GATE runs your configured `test_command` and inspects the output. It evaluates e
 - `SHIP` — all criteria PASS or PARTIAL (with justification)
 - `HOLD` — at least one FAIL; `hold_reason` is actionable for FORGE
 
-A HOLD stops the day. FORGE must fix the issue before Day N can advance.
+A HOLD stops the day. FORGE must fix the issue before Day N can advance. The `hold_reason` from whichever agent issued the HOLD is surfaced directly in the platform escalation issue (GitHub Issue, GitLab Issue, Jira ticket, etc.) so the blocked reason is always visible without reading raw YAML artifacts.
 
 ### SENTINEL — Security & SRE
 
@@ -166,6 +168,8 @@ Day N ships → advance to Day N+1
 ```
 
 A day does not advance until all three review agents issue SHIP or ADVISORY. HOLD is a hard block.
+
+When any agent HOLDs, the orchestrator captures the `hold_reason` and passes it to `open_escalation_issue`. The escalation issue on your platform will always display the hold reason, cascading through gate → sentinel → conduit reports if the primary source is empty.
 
 ## Advisory lifecycle
 
