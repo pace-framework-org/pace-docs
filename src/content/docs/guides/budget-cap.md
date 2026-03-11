@@ -9,7 +9,7 @@ PACE tracks token usage across every agent call and compares the accumulated dai
 
 ## How it works
 
-```
+```text
 Cron trigger fires
       ↓
 Check daily budget step
@@ -86,15 +86,17 @@ Analytical agents (PRIME, GATE, SENTINEL, CONDUIT) are single-call with 4k token
 
 ## Estimated daily cost
 
-Typical costs per successful sprint day (one SHIP attempt):
+Typical costs per successful sprint day (one SHIP attempt), including full pipeline (PRIME + FORGE + GATE + SENTINEL + CONDUIT):
 
 | Config | Estimated cost |
 | ------ | -------------- |
-| All Sonnet, 2 attempts | $2–4 |
-| Sonnet (FORGE) + Haiku (analysis), 1 attempt | $0.50–1.50 |
-| All Haiku | $0.10–0.30 (not recommended — FORGE quality degrades) |
+| All Sonnet, 2 attempts | $4–8 |
+| Sonnet (FORGE) + Haiku (analysis), 1 attempt | $1.50–3.00 |
+| All Haiku | $0.15–0.50 (not recommended — FORGE quality degrades) |
 
-A `PACE_DAILY_BUDGET` of `$10–15` comfortably covers 4× daily cron runs on normal days while blocking runaway spend if the pipeline enters a retry loop.
+> **Note (v1.2.0+):** The `Actual Cost (pipeline)` column in PROGRESS.md now tracks the full cycle cost (all agents), not just FORGE. This gives an accurate picture of true daily spend. FORGE-only cost is also available in the Cost Summary for reference.
+
+A `PACE_DAILY_BUDGET` of `$15–25` comfortably covers 4× daily cron runs on normal days while blocking runaway spend if the pipeline enters a retry loop.
 
 ## Day rollover
 

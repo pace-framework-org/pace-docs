@@ -1,0 +1,131 @@
+---
+title: Changelog
+description: Version history and release notes for the PACE framework.
+sidebar:
+  order: 99
+---
+
+All notable changes to the PACE framework are documented here.
+Versions follow [Semantic Versioning](https://semver.org/). Git tags (`v1.2.0`, `v1.1.0`, …) are applied to both the `pace-framework-starter` and the `nolapse-platform` repositories.
+
+---
+
+## v1.2.0 — 2026-03-11
+
+### Cost Estimation Accuracy (Option A)
+
+**PLANNER now uses `claude-sonnet-4-6` for Day 0 cost estimates** instead of `claude-haiku-4-5-20251001`.
+
+Previously, estimates were made using the cheap analysis model (Haiku at $0.80/$4.00 per M tokens) while FORGE ran on Sonnet ($3.00/$15.00 per M tokens) — a 3.75× pricing gap that caused estimates to be systematically 2–3× lower than actuals.
+
+Changes:
+
+- `planner.py` `_estimate_day_cost()` now accepts/uses the main LLM model parameter
+- Calibrated cost ranges updated for Sonnet pricing (simple: $0.50–$1.20, medium: $1.20–$2.50, complex: $2.50–$5.00+)
+- `planner.md` now includes `estimation_model` field so reports are self-documenting
+- Default fallback raised from $0.80 → $2.00 to match Sonnet reality
+- `orchestrator.py` passes `cfg.llm.model` (Sonnet) to `run_planner()` instead of `cfg.llm.analysis_model` (Haiku)
+
+### Full Pipeline Cost Tracking (Option C)
+
+**Actual cost now tracks the full PRIME → FORGE → GATE → SENTINEL → CONDUIT pipeline**, not just FORGE in isolation.
+
+Previously, `forge_cost_usd` in `handoff.md` only captured the FORGE agent's API cost. The analytical agents (each ~$0.05–$0.15) were tracked in `PACE_DAILY_SPEND` but not surfaced per-story in PROGRESS.md.
+
+Changes:
+
+- New per-day artifact: `.pace/day-N/cycle.md` — written on SHIP, contains:
+  - `cycle_cost_usd`: total cost of all agents for that day
+  - `forge_cost_usd`: FORGE-only cost (for reference)
+  - `generated_at`: ISO timestamp
+- `reporter.py` `_load_cycle_cost()`: reads `cycle.md` first, falls back to `forge_cost_usd` for backward compatibility with pre-v1.2.0 artifacts
+- PROGRESS.md column renamed from `Actual Cost` → `Actual Cost (pipeline)`
+- Cost Summary now shows both `Total actual (full pipeline)` and `Total actual (FORGE only)` rows
+
+### Re-planning / Re-budgeting (PACE_REPLAN)
+
+**New `PACE_REPLAN=true` mode** lets you refresh estimates mid-sprint without overwriting completed day actuals.
+
+Usage:
+
+```bash
+PACE_DAY=0 PACE_REPLAN=true ANTHROPIC_API_KEY=... python pace/orchestrator.py
+```
+
+Behaviour:
+
+- Reads `cycle.md` (or `handoff.md`) for each completed day to load actual costs
+- Preserves existing estimate + attaches actual for completed days (no new LLM call)
+- Re-estimates remaining days fresh using Sonnet
+- `planner.md` gains a `replan: true` field to distinguish from original Day 0 runs
+
+See [Day 0 — Sprint Planning](/guides/day-zero/) for full usage details.
+
+### Other
+
+- `PACE_VERSION` bumped to `"1.2.0"` in `config.py`
+- `orchestrator.py` imports `datetime`/`timezone` at module level (previously in `_update_daily_spend` closure)
+
+---
+
+## v1.1.0 — 2025-12
+
+### Advisory Backlog & Clearance Days
+
+- **Advisory backlog system**: SENTINEL and CONDUIT advisories that cannot be resolved in one retry are stored in `.pace/advisory_backlog.yaml` rather than causing a HOLD
+- **Clearance days** (every 7th day): FORGE is given the full open backlog to resolve; day fails if any items remain open after all agents run
+- **`push_to_issues`**: Optional flag to push backlogged advisory items to GitHub/GitLab issues automatically
+
+### SCOPE pre-check
+
+- Pre-FORGE cost prediction using the analysis model (Haiku); triggers PRIME refinement if `max_story_cost_usd` threshold is exceeded
+- Configurable via `cost_control.max_story_cost_usd` in `pace.config.yaml`
+
+### Platform adapters
+
+- Added GitLab CI adapter (`platforms/gitlab.py`)
+- Added Bitbucket Pipelines adapter (`platforms/bitbucket.py`)
+- Added Jenkins adapter (`platforms/jenkins.py`)
+- `get_ci_adapter()` / `get_tracker_adapter()` factory functions auto-detect from `pace.config.yaml`
+
+### Multi-LLM support (LiteLLM)
+
+- `llm/` adapter layer added: `AnthropicAdapter` and `LiteLLMAdapter`
+- Set `provider: litellm` in `pace.config.yaml` to route FORGE/SCRIBE through any OpenAI-compatible endpoint (Ollama, Azure OpenAI, Bedrock, etc.)
+- `get_llm_adapter(model=...)` factory used by all agents
+
+---
+
+## v1.0.0 — 2025-11
+
+Initial release of the PACE (Plan → Act → Check → Evolve) framework.
+
+### Core pipeline
+
+- `orchestrator.py`: PRIME → FORGE → GATE → SENTINEL → CONDUIT daily cycle
+- `agents/prime.py`: Story card generation from plan targets
+- `agents/forge.py`: Agentic TDD code-writing with tool-use loop (read/write/bash/git)
+- `agents/gate.py`: Acceptance criteria validation
+- `agents/sentinel.py`: Security and SRE review
+- `agents/conduit.py`: DevOps and CI/CD review
+
+### Day 0 planning
+
+- `planner.py`: Per-day cost estimation using analysis model
+- `PROGRESS.md` populated with estimated costs before sprint begins
+
+### Cost tracking
+
+- `spend_tracker.py`: Per-model token accounting via adapter layer
+- `PACE_DAILY_SPEND` / `PACE_DAILY_BUDGET` variable-based budget cap
+- Daily spend flushed to CI variable on `atexit`
+
+### Reporter
+
+- `reporter.py`: `update_progress_md()` and `write_job_summary()` for CI job summaries
+- Sprint stats: SHIP rate, deferred items, escalated holds, open advisories
+
+### GitHub Actions integration
+
+- `pace.yml` workflow: cron + manual dispatch, budget-check step, day counter advancement
+- `pace.config.yaml`: single configuration file for product, sprint, LLM, platform, and cost-control settings
