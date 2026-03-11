@@ -208,6 +208,11 @@ Set `reporter.timezone` to your team's local timezone (e.g. `Asia/Kolkata`, `Ame
 cost_control:
   max_story_ac: 5
   max_story_cost_usd: 1.50
+
+forge:
+  tdd_enforcement: true
+  coverage_rule: true
+  max_iterations: 35
 ```
 
 Controls proactive story scoping. When a story exceeds either threshold, PRIME is automatically re-invoked to split it: today's story carries the highest-value criteria (up to `max_story_ac`), and the remainder is written to `.pace/day-N/deferred_scope.yaml` for the next day's PRIME to pick up automatically.
@@ -220,6 +225,31 @@ Controls proactive story scoping. When a story exceeds either threshold, PRIME i
 Up to 2 refinement rounds are attempted. If refinement fails, FORGE runs on the original story as a fallback.
 
 See [Proactive Story Scoping](/guides/story-scoping/) for details and threshold tuning guidance.
+
+---
+
+## `forge`
+
+```yaml
+forge:
+  tdd_enforcement: true
+  coverage_rule: true
+  max_iterations: 35
+```
+
+Controls how the FORGE agent runs each story. All fields are optional — defaults match the previous hardcoded behaviour.
+
+**`tdd_enforcement`** boolean · default `true`
+
+Mandatory 4-phase TDD (RED → GREEN → REFACTOR → COMMIT). The `confirm_red_phase` tool is a hard gate — FORGE cannot call `complete_handoff` without first running the suite and proving at least one new test fails. Set `false` for stories with nothing to test (docs, infra, migrations).
+
+**`coverage_rule`** boolean · default `true`
+
+Inject the COVERAGE RULE into FORGE's system prompt. Every production file FORGE creates or modifies must have corresponding tests; existing test counts must not decrease. Only effective when `tdd_enforcement` is `true`.
+
+**`max_iterations`** integer · default `35`
+
+Safety limit on the agentic tool-use loop. If FORGE does not call `complete_handoff` within this many LLM calls the run raises an error and the pipeline fails. See [Tuning max_iterations](/guides/enforce-test-coverage/#tuning-max_iterations).
 
 ---
 
