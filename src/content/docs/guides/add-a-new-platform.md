@@ -1,194 +1,120 @@
 ---
 title: Add a New Platform
-description: Implement a custom PlatformAdapter to connect PACE to any CI/CD or Git hosting platform.
+description: How to implement CIAdapter and TrackerAdapter for a new CI/CD or issue-tracking platform.
 sidebar:
   order: 6
 ---
 
-If your CI/CD platform isn't natively supported, you can add it by implementing the `PlatformAdapter` abstract base class. This guide walks through the full implementation.
+# Add a New Platform
 
-## Prerequisites
+PACE uses two separate abstract base classes for platform integration:
 
-Familiarity with:
-- Python dataclasses and abstract base classes
-- Your platform's REST API or SDK
+- **`CIAdapter`** — CI/CD and Git hosting (PRs, CI polling, job summaries)
+- **`TrackerAdapter`** — Sprint tracker / issue platform (escalations, advisory findings)
 
-## 1 — Create the adapter file
+You can implement one or both depending on what your platform supports.
 
-Create `pace/platforms/myplatform.py`:
+## Step 1: Create your adapter file
+
+Create `pace/platforms/myplatform.py`. Import the base class(es) you need:
 
 ```python
-"""MyPlatform adapter for PACE."""
-
-import os
-from pathlib import Path
-from .base import PlatformAdapter
-
-
-class MyPlatformAdapter(PlatformAdapter):
-    """PACE platform adapter for MyPlatform."""
-
-    def __init__(self):
-        self.api_key = os.environ["MYPLATFORM_API_KEY"]
-        self.project = os.environ["MYPLATFORM_PROJECT"]
-        # Initialise your SDK / HTTP client here
-
-    def open_review_pr(self, day: int, pace_dir: Path) -> str:
-        """Create a pull/merge request and return its URL."""
-        title = f"PACE Day {day} Review"
-        body_file = pace_dir / f"day-{day}" / "review-pr.md"
-        body = body_file.read_text() if body_file.exists() else ""
-
-        # Call your platform API to create the PR
-        pr = self._client.create_pr(title=title, body=body)
-        return pr.url
-
-    def open_escalation_issue(self, day: int, day_dir: Path) -> str:
-        """Create an escalation issue and return its URL."""
-        issue_file = day_dir / "escalation-issue.md"
-        body = issue_file.read_text() if issue_file.exists() else ""
-
-        issue = self._client.create_issue(
-            title=f"PACE Day {day} Escalation",
-            body=body,
-        )
-        return issue.url
-
-    def wait_for_commit_ci(
-        self,
-        sha: str,
-        timeout_minutes: int = 15,
-        poll_interval: int = 20,
-    ) -> dict:
-        """Poll for CI result and return a result dict."""
-        import time
-
-        deadline = time.time() + timeout_minutes * 60
-        while time.time() < deadline:
-            build = self._client.get_build_for_sha(sha)
-            if build and build.status in ("success", "failed", "cancelled"):
-                return {
-                    "conclusion": "success" if build.status == "success" else "failure",
-                    "name": build.pipeline_name,
-                    "sha": sha,
-                    "url": build.url,
-                }
-            time.sleep(poll_interval)
-
-        return {"conclusion": "timeout", "sha": sha}
-
-    def post_daily_summary(self, day: int, gate_report: dict) -> None:
-        """Post a summary comment or status update."""
-        decision = gate_report.get("gate_decision", "UNKNOWN")
-        message = f"PACE Day {day}: {decision}"
-        self._client.post_comment(message)
-
-    def write_job_summary(self, markdown: str) -> None:
-        """Write the markdown summary to a platform-specific location."""
-        summary_file = Path("pace-summary.md")
-        summary_file.write_text(markdown, encoding="utf-8")
+from platforms.base import CIAdapter, TrackerAdapter
 ```
 
-## 2 — The PlatformAdapter interface
+## Step 2: Implement CIAdapter (optional)
 
-All five methods are required:
+If your platform supports PRs/MRs and CI pipelines:
 
 ```python
-class PlatformAdapter(ABC):
-    @abstractmethod
+class MyPlatformCIAdapter(CIAdapter):
+    def __init__(self, token: str, ...) -> None:
+        self._token = token
+        self._available = bool(token)
+
     def open_review_pr(self, day: int, pace_dir: Path) -> str:
-        """Return the PR/MR URL."""
+        """Open a PR/MR for a human gate day. Return its URL."""
+        ...
 
-    @abstractmethod
-    def open_escalation_issue(self, day: int, day_dir: Path) -> str:
-        """Return the issue URL."""
+    def wait_for_commit_ci(self, sha: str, timeout_minutes: int = 15, poll_interval: int = 20) -> dict:
+        """Poll CI until the commit reaches a terminal state.
 
-    @abstractmethod
-    def wait_for_commit_ci(
-        self,
-        sha: str,
-        timeout_minutes: int = 15,
-        poll_interval: int = 20,
-    ) -> dict:
-        """Return dict with keys: conclusion, name, sha, url.
-        conclusion values: 'success' | 'failure' | 'timeout' | 'no_runs'
+        Return dict with keys: conclusion, url, name, sha
+        conclusion must be one of: success | failure | cancelled | no_runs | timeout
         """
+        ...
 
-    @abstractmethod
     def post_daily_summary(self, day: int, gate_report: dict) -> None:
-        """Post a daily status update to the platform."""
+        """Post a one-line status update."""
+        ...
 
-    @abstractmethod
     def write_job_summary(self, markdown: str) -> None:
-        """Write the markdown job summary to a platform-specific location."""
+        """Write the full markdown report to the platform's job/run UI."""
+        ...
+
+    def set_variable(self, name: str, value: str) -> bool:
+        """Set a CI/CD pipeline variable. Return True on success."""
+        ...  # Optional: base class returns False (non-fatal)
 ```
 
-## 3 — Register the adapter
+## Step 3: Implement TrackerAdapter (optional)
 
-Open `pace/platforms/__init__.py` and add your adapter to the factory:
+If your platform supports issue tracking:
 
 ```python
-from .myplatform import MyPlatformAdapter
+class MyPlatformTrackerAdapter(TrackerAdapter):
+    def __init__(self, token: str, ...) -> None:
+        self._token = token
+        self._available = bool(token)
 
-def get_platform_adapter() -> PlatformAdapter:
-    cfg = load_config()
-    platform_type = cfg.platform_type
+    def open_escalation_issue(self, day: int, day_dir: Path, hold_reason: str = "") -> str:
+        """Open a HOLD escalation ticket. Return its URL."""
+        ...
 
-    if platform_type == "github":
-        return GitHubAdapter()
-    elif platform_type == "gitlab":
-        return GitLabAdapter()
-    elif platform_type == "bitbucket":
-        return BitbucketAdapter()
-    elif platform_type == "jenkins":
-        return JenkinsAdapter()
-    elif platform_type == "local":
-        return LocalAdapter()
-    elif platform_type == "myplatform":          # ← add this
-        return MyPlatformAdapter()               # ← and this
-    else:
-        raise ValueError(f"Unknown platform type: {platform_type!r}")
+    def push_advisory_items(self, day: int, items: list[dict], agent: str) -> str:
+        """Open an advisory findings ticket. Return its URL."""
+        ...
 ```
 
-## 4 — Update pace.config.yaml
+## Step 4: Register in the factory
+
+Edit `pace/platforms/__init__.py` and add your platform to the factory functions:
+
+```python
+def get_ci_adapter() -> CIAdapter:
+    ...
+    if ci_type == "myplatform":
+        from platforms.myplatform import MyPlatformCIAdapter
+        return MyPlatformCIAdapter(
+            token=os.environ.get("MYPLATFORM_TOKEN", ""),
+        )
+    ...
+
+def get_tracker_adapter() -> TrackerAdapter:
+    ...
+    if tracker_type == "myplatform":
+        from platforms.myplatform import MyPlatformTrackerAdapter
+        return MyPlatformTrackerAdapter(
+            token=os.environ.get("MYPLATFORM_TOKEN", ""),
+        )
+    ...
+```
+
+## Step 5: Configure
+
+Update `pace.config.yaml`:
 
 ```yaml
 platform:
-  type: myplatform
+  ci: myplatform      # if implementing CIAdapter
+  tracker: myplatform  # if implementing TrackerAdapter
 ```
 
-## 5 — Test your adapter
+Add the required environment variables to your CI/CD pipeline configuration.
 
-```bash
-python -c "
-from pace.platforms import get_platform_adapter
-adapter = get_platform_adapter()
-print(type(adapter))
-result = adapter.wait_for_commit_ci('abc123', timeout_minutes=1)
-print(result)
-"
-```
+## Tips
 
-## CI result dictionary
-
-`wait_for_commit_ci` must return a dictionary with these keys:
-
-| Key | Type | Values |
-|-----|------|--------|
-| `conclusion` | str | `"success"`, `"failure"`, `"timeout"`, `"no_runs"` |
-| `name` | str | Pipeline/workflow name (for display) |
-| `sha` | str | The commit SHA that was polled |
-| `url` | str \| None | Link to the CI run |
-
-GATE uses `conclusion` to evaluate the CI criterion:
-- `"success"` → PASS
-- `"failure"` → FAIL
-- `"timeout"` or `"no_runs"` → PARTIAL (if out_of_scope) or FAIL
-
-## Submitting your adapter
-
-If your adapter could benefit others, open a pull request against the [pace-framework-starter](https://github.com/pace-framework-org/pace-framework-starter) repository. Include:
-- The adapter file in `pace/platforms/`
-- The factory registration in `pace/platforms/__init__.py`
-- Required environment variables documented in `README.md`
-- A brief section in `pace.config.yaml` comments
+- If your platform only supports CI (e.g. Jenkins), only implement `CIAdapter`. Set `tracker:` to a platform that supports issue tracking (Jira, GitHub Issues, etc.).
+- If your platform only supports issue tracking (e.g. Jira), only implement `TrackerAdapter`. Set `ci:` to a platform that supports CI.
+- The `set_variable` method in `CIAdapter` is optional — the base class returns `False` which is treated as non-fatal by the orchestrator.
+- All methods should handle errors internally and return empty strings / `False` on failure rather than raising exceptions.
