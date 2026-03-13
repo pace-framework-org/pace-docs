@@ -94,7 +94,7 @@ Typical costs per successful sprint day (one SHIP attempt), including full pipel
 | Sonnet (FORGE) + Haiku (analysis), 1 attempt | $1.50–3.00 |
 | All Haiku | $0.15–0.50 (not recommended — FORGE quality degrades) |
 
-> **Note (v1.2.0+):** The `Actual Cost (pipeline)` column in PROGRESS.md now tracks the full cycle cost (all agents), not just FORGE. This gives an accurate picture of true daily spend. FORGE-only cost is also available in the Cost Summary for reference.
+> **Note (v1.4.0+):** The `Actual Cost` column in PROGRESS.md now tracks the full cycle cost including retries. Days with multiple attempts show a `(Nx)` suffix (e.g. `$6.59 (2×)`). The Cost Summary includes "Total actual (incl. retries)" and "Wasted on retries" rows so you can see exactly how much budget was consumed by failed attempts. FORGE-only cost is also available for reference.
 
 A `PACE_DAILY_BUDGET` of `$15–25` comfortably covers 4× daily cron runs on normal days while blocking runaway spend if the pipeline enters a retry loop.
 

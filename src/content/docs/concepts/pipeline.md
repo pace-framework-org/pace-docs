@@ -194,6 +194,8 @@ All artifacts are saved to `.pace/day-N/`:
     ├── sentinel-report.yaml
     ├── conduit-report.yaml
     ├── scribe-report.yaml
+    ├── cycle.md            ← pipeline cost (written on SHIP)
+    ├── attempts.yaml       ← cost + outcome of every run incl. retries
     ├── review-pr.md        ← PR body (or opened PR URL)
     └── escalation-issue.md ← issue body (if advisory escalated)
 ```

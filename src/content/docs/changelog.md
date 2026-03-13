@@ -10,6 +10,64 @@ Versions follow [Semantic Versioning](https://semver.org/). Git tags (`v1.3.0`, 
 
 ---
 
+## v1.4.0 — 2026-03-13
+
+### Retry cost visibility — `attempts.yaml`
+
+**PACE now records the cost and outcome of every pipeline run — including failed retries — in a per-day artifact.**
+
+Previously, `cycle.md` was only written on SHIP, so the cost of HOLDs and retries was invisible. A day that retried three times at $3.50 each appeared in PROGRESS.md as "$3.50" (the successful run) with no indication of the $7.00 burned on failed attempts.
+
+New per-day artifact: `.pace/day-N/attempts.yaml`
+
+```yaml
+- run: 1
+  date: "2026-03-13T04:12:33Z"
+  cost_usd: 3.4821
+  outcome: HOLD
+  hold_reason: "GATE HOLD: CI timed out waiting for check-runs"
+- run: 2
+  date: "2026-03-13T05:47:11Z"
+  cost_usd: 3.1054
+  outcome: SHIP
+```
+
+PROGRESS.md changes:
+- Actual Cost column renamed from `Actual Cost (pipeline)` → `Actual Cost`
+- Days with multiple attempts show a `(Nx)` suffix (e.g. `$6.59 (2×)`)
+- Cost Summary gains two new rows: `Total actual (incl. retries)` and `Wasted on retries`
+
+### FORGE: Directory guard
+
+FORGE no longer crashes with `[Errno 21] Is a directory` when the LLM passes a directory path to `read_file` or `write_file`.
+
+- `read_file` on a directory path now returns a listing of files inside the directory, helping FORGE pick the correct file on its next call
+- `write_file` on a directory path returns an actionable error with a file path hint (e.g. `"Specify the full file path (e.g. 'src/foo/action.yml')"`)
+
+### FORGE: Safe tool dispatch
+
+`_dispatch_tool` now uses `.get()` for all argument access and returns descriptive `ERROR:` strings when required arguments are missing. Previously, a missing `path` or `content` field (which can happen when the LLM omits a required argument) raised a `KeyError` that crashed the pipeline mid-run.
+
+### FORGE: String list coercion
+
+`known_gaps` and `edge_cases_tested` in the FORGE handoff are automatically coerced from markdown bullet strings to Python lists before JSON Schema validation. The LLM occasionally returns these fields as multi-line strings (`"- item one\n- item two"`) rather than YAML arrays, causing spurious schema validation failures.
+
+### GitHub platform: 422 early-return in CI polling
+
+`wait_for_commit_ci` now returns `{"conclusion": "no_runs"}` immediately on HTTP 422, instead of retrying for the full `timeout_minutes` (default: 15 minutes). HTTP 422 from the GitHub check-runs API means the commit SHA is unknown to the CI system — this happens when FORGE pushes to a branch that has no CI workflow trigger. Retrying does not help and burns the full polling window.
+
+If your project's CI workflow does not trigger on the FORGE commit branch, GATE will now receive `no_runs` promptly and can evaluate non-CI acceptance criteria immediately.
+
+### `spend_tracker.install()` monkeypatch
+
+`orchestrator.py` now calls `spend_tracker.install()` at module load time. This monkeypatches the Anthropic SDK so that FORGE's direct API calls (which bypass the LLM adapter layer) are correctly attributed to the run's cost total. Previously, projects using the generic `forge.py` (which calls `anthropic.Anthropic()` directly) under-reported FORGE cost in `PACE_DAILY_SPEND` and `cycle.md`.
+
+### Other
+
+- `PACE_VERSION` bumped to `"1.4.0"` in `config.py`
+
+---
+
 ## v1.3.0 — 2026-03-11
 
 ### Configurable FORGE behaviour

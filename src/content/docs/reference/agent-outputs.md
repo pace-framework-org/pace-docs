@@ -189,6 +189,58 @@ hold_reason: ""
 
 ---
 
+## Cycle Cost Record
+
+File: `.pace/day-N/cycle.md`
+
+Written by the orchestrator on SHIP (after all agents pass). Contains the total pipeline cost for the day.
+
+```yaml
+day: 1
+cycle_cost_usd: 2.8431
+forge_cost_usd: 2.3105
+generated_at: "2026-03-13T05:47:11Z"
+```
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `day` | integer | Day number |
+| `cycle_cost_usd` | float | Total cost of the full PRIME → FORGE → GATE → SENTINEL → CONDUIT pipeline for this day |
+| `forge_cost_usd` | float | FORGE-only cost (subset of `cycle_cost_usd`) |
+| `generated_at` | string | ISO-8601 UTC timestamp when the cycle completed |
+
+---
+
+## Run Attempts Log
+
+File: `.pace/day-N/attempts.yaml`
+
+Appended to after every pipeline run (SHIP or HOLD), including retries. Provides a complete cost history for each day, making retry costs visible in PROGRESS.md.
+
+```yaml
+- run: 1
+  date: "2026-03-13T04:12:33Z"
+  cost_usd: 3.4821
+  outcome: HOLD
+  hold_reason: "GATE HOLD: CI timed out waiting for check-runs"
+- run: 2
+  date: "2026-03-13T05:47:11Z"
+  cost_usd: 3.1054
+  outcome: SHIP
+```
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `run` | integer | Attempt number (1-based) |
+| `date` | string | ISO-8601 UTC timestamp for this attempt |
+| `cost_usd` | float | Full LLM spend for this run (all agents) |
+| `outcome` | string | `SHIP` or `HOLD` |
+| `hold_reason` | string | First 120 characters of the hold reason (only present on HOLD) |
+
+PROGRESS.md shows `$X.XX (Nx)` in the Actual Cost column when `N > 1`, and the Cost Summary includes "Total actual (incl. retries)" and "Wasted on retries" rows.
+
+---
+
 ## Decision semantics
 
 | Decision | Meaning | Day advances? |
